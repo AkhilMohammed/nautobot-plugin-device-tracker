@@ -1,0 +1,7 @@
+version: '3.8'
+services:
+  nautobot:
+    volumes:
+      - ../nautobot_plugin_example:/nautobot_plugin_example:cached
+    environment:
+      DEBUG: "True"

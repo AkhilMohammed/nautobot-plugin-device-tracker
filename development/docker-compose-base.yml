@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  nautobot:
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      NAUTOBOT_SETTINGS: development/nautobot_config.py
+    depends_on:
+      - postgres
+      - redis
+
+  celery_worker:
+    image: celery:latest
+    command: celery -A nautobot worker -l info
+    environment:
+      CELERY_BROKER_URL: redis://redis:6379/0
+    depends_on:
+      - redis
+
+  celery_beat:
+    image: celery:latest
+    command: celery -A nautobot beat -l info
+    environment:
+      CELERY_BROKER_URL: redis://redis:6379/0
+    depends_on:
+      - redis
+
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: nautobot
+      POSTGRES_USER: nautobot
+      POSTGRES_PASSWORD: nautobot
+
+  redis:
+    image: redis:6-alpine

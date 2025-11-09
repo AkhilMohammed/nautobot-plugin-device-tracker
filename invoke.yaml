@@ -1,0 +1,26 @@
+tasks:
+  build:
+    doc: Build the nautobot Docker image
+    cmds:
+      - invoke docker_login --username youruser --password yourpass
+      - invoke docker_push
+
+  start:
+    doc: Start the nautobot plugin environment
+    cmds:
+      - invoke start
+
+  stop:
+    doc: Stop the nautobot plugin environment
+    cmds:
+      - invoke stop
+
+  logs:
+    doc: Show logs of containers
+    cmds:
+      - invoke logs
+
+  test:
+    doc: Run tests
+    cmds:
+      - invoke test

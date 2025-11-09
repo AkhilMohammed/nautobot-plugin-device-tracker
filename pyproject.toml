@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "nautobot-plugin-example"
+version = "0.1.0"
+description = "Production-ready Nautobot Plugin example with Celery & Redis"
+authors = ["You <you@example.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+nautobot = "^1.5.0"
+celery = "^5.2"
+redis = "^4.5"
+
+[tool.poetry.dev-dependencies]
+invoke = "*"
+pytest = "*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
