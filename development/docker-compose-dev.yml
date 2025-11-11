@@ -1,7 +1,44 @@
-version: '3.8'
+version: "3.8"
 services:
   nautobot:
+    command: "nautobot-server runserver 0.0.0.0:8080"
+    ports:
+      - "8080:8080"
     volumes:
-      - ../nautobot_plugin_example:/nautobot_plugin_example:cached
+      - "./nautobot_config.py:/opt/nautobot/nautobot_config.py"
+      - "../:/source"
+      - "./static:/opt/nautobot/static"     # Add this line
+      - "./media:/opt/nautobot/media"
     environment:
-      DEBUG: "True"
+      - PYTHONPATH=/source
+    healthcheck:
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3
+      test: ["CMD", "true"]
+
+  worker:
+    entrypoint:
+      - "sh"
+      - "-c"
+      - "watchmedo auto-restart --directory './' --pattern '*.py' --recursive -- nautobot-server celery worker -l $$NAUTOBOT_LOG_LEVEL --events"
+    volumes:
+      - "./nautobot_config.py:/opt/nautobot/nautobot_config.py"
+      - "../:/source"
+    environment:
+      - PYTHONPATH=/source
+    healthcheck:
+      test: ["CMD", "true"]
+
+  beat:
+    entrypoint:
+      - "sh"
+      - "-c"
+      - "watchmedo auto-restart --directory './' --pattern '*.py' --recursive -- nautobot-server celery beat -l $$NAUTOBOT_LOG_LEVEL"
+    volumes:
+      - "./nautobot_config.py:/opt/nautobot/nautobot_config.py"
+      - "../:/source"
+    environment:
+      - PYTHONPATH=/source
+

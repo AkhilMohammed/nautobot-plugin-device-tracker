@@ -1,39 +1,72 @@
 version: '3.8'
+
+x-nautobot-build: &nautobot-build
+  build:
+    args:
+      NAUTOBOT_VER: "${NAUTOBOT_VER}"
+      PYTHON_VER: "${PYTHON_VER}"
+      DOCKERHUB_USER: "${DOCKERHUB_USER}"
+      DOCKERHUB_TOKEN: "${DOCKERHUB_TOKEN}"
+    context: "../"
+    dockerfile: "development/Dockerfile"
+
+x-nautobot-base: &nautobot-base
+  image: "nautobot-app-template/nautobot:${NAUTOBOT_VER}-py${PYTHON_VER}"
+  env_file:
+    - "development.env"
+    - "creds.env"
+  tty: true
+
 services:
   nautobot:
-    build:
-      context: ../
-      dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
-    environment:
-      NAUTOBOT_SETTINGS: development/nautobot_config.py
     depends_on:
-      - postgres
-      - redis
+      redis:
+        condition: "service_started"
+      db:
+        condition: "service_healthy"
+    <<:
+      - *nautobot-base
+      - *nautobot-build
 
-  celery_worker:
-    image: celery:latest
-    command: celery -A nautobot worker -l info
-    environment:
-      CELERY_BROKER_URL: redis://redis:6379/0
+  worker:
+    entrypoint:
+      - "sh"
+      - "-c"
+      - "nautobot-server celery worker -l $$NAUTOBOT_LOG_LEVEL --events"
     depends_on:
-      - redis
+      nautobot:
+        condition: "service_healthy"
+    healthcheck:
+      interval: "30s"
+      timeout: "10s"
+      start_period: "30s"
+      retries: 3
+      test: ["CMD", "bash", "-c", "nautobot-server celery inspect ping --destination celery@$$HOSTNAME"]
+    <<: *nautobot-base
 
-  celery_beat:
-    image: celery:latest
-    command: celery -A nautobot beat -l info
-    environment:
-      CELERY_BROKER_URL: redis://redis:6379/0
+  beat:
+    entrypoint:
+      - "sh"
+      - "-c"
+      - "nautobot-server celery beat -l $$NAUTOBOT_LOG_LEVEL"
     depends_on:
-      - redis
+      nautobot:
+        condition: "service_healthy"
+    healthcheck:
+      disable: true
+    <<: *nautobot-base
 
-  postgres:
+  redis:
+    image: redis:6-alpine
+
+  db:
     image: postgres:13
     environment:
       POSTGRES_DB: nautobot
       POSTGRES_USER: nautobot
       POSTGRES_PASSWORD: nautobot
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nautobot"]
+      interval: 10s
+      retries: 5
 
-  redis:
-    image: redis:6-alpine

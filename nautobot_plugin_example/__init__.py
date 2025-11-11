@@ -1,1 +1,5 @@
-default_app_config = 'nautobot_plugin_example.apps.NautobotPluginExampleConfig'
+
+from nautobot_plugin_example.apps import NautobotPluginExampleConfig
+
+config = NautobotPluginExampleConfig
+
