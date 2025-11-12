@@ -1,19 +1,30 @@
 [tool.poetry]
 name = "nautobot-plugin-example"
 version = "0.1.0"
-description = "Production-ready Nautobot Plugin example with Celery & Redis"
+description = "NTC style production-ready Nautobot plugin"
 authors = ["You <you@example.com>"]
+readme = "README.md"
+license = "Apache-2.0"
+homepage = "https://github.com/AkhilMohammed/nautobot-plugin-device-tracker.git"
+repository = "https://github.com/AkhilMohammed/nautobot-plugin-device-tracker.git"
 
 [tool.poetry.dependencies]
-python = "^3.11"
-nautobot = "^1.5.0"
+python = ">=3.11,<3.12"
+nautobot = "^2.0.0"
 celery = "^5.2"
 redis = "^4.5"
+drf-yasg = "^1.21.11"
 
 [tool.poetry.dev-dependencies]
 invoke = "*"
 pytest = "*"
 
+[tool.poetry.extras]
+all = ["some-package", "another-package"]
+dev = ["invoke", "pytest"]
+
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
