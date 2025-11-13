@@ -7,8 +7,6 @@ services:
     volumes:
       - "./nautobot_config.py:/opt/nautobot/nautobot_config.py"
       - "../:/source"
-      - "./static:/opt/nautobot/static"     # Add this line
-      - "./media:/opt/nautobot/media"
     environment:
       - PYTHONPATH=/source
     healthcheck:
