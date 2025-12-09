@@ -10,7 +10,7 @@ repository = "https://github.com/AkhilMohammed/nautobot-plugin-device-tracker.gi
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.12"
-nautobot = "^2.0.0"
+nautobot = "^2.4.7"
 celery = "^5.2"
 redis = "^4.5"
 drf-yasg = "^1.21.11"
