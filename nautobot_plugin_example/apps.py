@@ -15,7 +15,7 @@ class NautobotPluginExampleConfig(NautobotAppConfig):
     required_settings = []
     default_settings = {}
     min_version = "1.0.0"
-    max_version = "3.0.0"
+    # max_version = "3.0.0"
     caching_config = {}
 
     def ready(self):
